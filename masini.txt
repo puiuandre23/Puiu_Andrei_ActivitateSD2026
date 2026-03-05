@@ -1,0 +1,5 @@
+1,4,25000.5,BMW,Popescu,A
+2,2,18000.0,Audi,Ionescu,B
+3,4,32000.75,Mercedes,Georgescu,C
+4,5,15000.25,Skoda,Dumitrescu,D
+5,3,21000.9,Toyota,Popa,E
