@@ -1,0 +1,5 @@
+1,20,9.50,Popescu,CSIE,A
+2,21,8.75,Ionescu,CSIE,B
+3,19,9.10,Georgescu,Informatica,C
+4,22,7.95,Dumitrescu,Cibernetica,A
+5,20,9.80,Popa,Statistica,B
