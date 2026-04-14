@@ -264,7 +264,7 @@ int main() {
 		free(masina.numeSofer);
 	}
 
-
+	//
 	afisareMasina(dequeue(&queue));
 	return 0;
 }
