@@ -3,189 +3,185 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct StructuraMasina {
-	int id;
-	int nrUsi;
-	float pret;
-	char* model;
-	char* numeSofer;
-	unsigned char serie;
+struct StructuraStudent {
+    int id;
+    int varsta;
+    float medie;
+    char* nume;
+    char* facultate;
+    unsigned char grupa;
 };
-typedef struct StructuraMasina Masina;
+typedef struct StructuraStudent Student;
 
 struct Heap {
-	Masina* vector;
-	int lungime;
-	int nrElemente;
+    Student* vector;
+    int lungime;
+    int nrElemente;
 };
 typedef struct Heap Heap;
 
-Masina citireMasinaDinFisier(FILE* file) {
-	char buffer[100];
-	char sep[3] = ",\n";
-	char* aux;
-	Masina m1;
+Student citireStudentDinFisier(FILE* file) {
+    char buffer[100];
+    char sep[3] = ",\n";
+    fgets(buffer, 100, file);
 
-	fgets(buffer, 100, file);
+    char* aux;
+    Student s;
 
-	aux = strtok(buffer, sep);
-	m1.id = atoi(aux);
+    aux = strtok(buffer, sep);
+    s.id = atoi(aux);
 
-	aux = strtok(NULL, sep);
-	m1.nrUsi = atoi(aux);
+    s.varsta = atoi(strtok(NULL, sep));
+    s.medie = (float)atof(strtok(NULL, sep));
 
-	aux = strtok(NULL, sep);
-	m1.pret = (float)atof(aux);
+    aux = strtok(NULL, sep);
+    s.nume = (char*)malloc(strlen(aux) + 1);
+    strcpy(s.nume, aux);
 
-	aux = strtok(NULL, sep);
-	m1.model = (char*)malloc(strlen(aux) + 1);
-	strcpy(m1.model, aux);
+    aux = strtok(NULL, sep);
+    s.facultate = (char*)malloc(strlen(aux) + 1);
+    strcpy(s.facultate, aux);
 
-	aux = strtok(NULL, sep);
-	m1.numeSofer = (char*)malloc(strlen(aux) + 1);
-	strcpy(m1.numeSofer, aux);
+    s.grupa = *strtok(NULL, sep);
 
-	aux = strtok(NULL, sep);
-	m1.serie = aux[0];
-
-	return m1;
+    return s;
 }
 
-void afisareMasina(Masina masina) {
-	printf("Id: %d\n", masina.id);
-	printf("Nr. usi: %d\n", masina.nrUsi);
-	printf("Pret: %.2f\n", masina.pret);
-	printf("Model: %s\n", masina.model);
-	printf("Nume sofer: %s\n", masina.numeSofer);
-	printf("Serie: %c\n\n", masina.serie);
+void afisareStudent(Student student) {
+    printf("Id: %d\n", student.id);
+    printf("Varsta: %d\n", student.varsta);
+    printf("Medie: %.2f\n", student.medie);
+    printf("Nume: %s\n", student.nume);
+    printf("Facultate: %s\n", student.facultate);
+    printf("Grupa: %c\n\n", student.grupa);
 }
 
 Heap initializareHeap(int lungime) {
-	Heap heap;
-	heap.lungime = lungime;
-	heap.nrElemente = 0;
-	heap.vector = (Masina*)malloc(sizeof(Masina) * lungime);
-	return heap;
+    Heap heap;
+    heap.lungime = lungime;
+    heap.nrElemente = 0;
+    heap.vector = (Student*)malloc(sizeof(Student) * lungime);
+    return heap;
 }
 
 void filtreazaHeap(Heap heap, int pozitieNod) {
-	int pozitieStanga = 2 * pozitieNod + 1;
-	int pozitieDreapta = 2 * pozitieNod + 2;
-	int pozitieMax = pozitieNod;
+    int pozitieStanga = 2 * pozitieNod + 1;
+    int pozitieDreapta = 2 * pozitieNod + 2;
+    int pozitieMax = pozitieNod;
 
-	if (pozitieStanga < heap.nrElemente &&
-		heap.vector[pozitieStanga].id > heap.vector[pozitieMax].id) {
-		pozitieMax = pozitieStanga;
-	}
+    if (pozitieStanga < heap.nrElemente &&
+        heap.vector[pozitieStanga].medie > heap.vector[pozitieMax].medie) {
+        pozitieMax = pozitieStanga;
+    }
 
-	if (pozitieDreapta < heap.nrElemente &&
-		heap.vector[pozitieDreapta].id > heap.vector[pozitieMax].id) {
-		pozitieMax = pozitieDreapta;
-	}
+    if (pozitieDreapta < heap.nrElemente &&
+        heap.vector[pozitieDreapta].medie > heap.vector[pozitieMax].medie) {
+        pozitieMax = pozitieDreapta;
+    }
 
-	if (pozitieMax != pozitieNod) {
-		Masina aux = heap.vector[pozitieMax];
-		heap.vector[pozitieMax] = heap.vector[pozitieNod];
-		heap.vector[pozitieNod] = aux;
+    if (pozitieMax != pozitieNod) {
+        Student aux = heap.vector[pozitieMax];
+        heap.vector[pozitieMax] = heap.vector[pozitieNod];
+        heap.vector[pozitieNod] = aux;
 
-		filtreazaHeap(heap, pozitieMax);
-	}
+        filtreazaHeap(heap, pozitieMax);
+    }
 }
 
-Heap citireHeapDeMasiniDinFisier(const char* numeFisier) {
-	FILE* f = fopen(numeFisier, "r");
-	Heap heap = initializareHeap(10);
+Heap citireHeapDeStudentiDinFisier(const char* numeFisier) {
+    FILE* f = fopen(numeFisier, "r");
+    Heap heap = initializareHeap(10);
 
-	if (f != NULL) {
-		while (!feof(f)) {
-			if (heap.nrElemente < heap.lungime) {
-				heap.vector[heap.nrElemente] = citireMasinaDinFisier(f);
-				heap.nrElemente++;
-			}
-		}
+    if (f != NULL) {
+        while (!feof(f)) {
+            if (heap.nrElemente < heap.lungime) {
+                heap.vector[heap.nrElemente] = citireStudentDinFisier(f);
+                heap.nrElemente++;
+            }
+        }
 
-		fclose(f);
+        fclose(f);
 
-		heap.lungime = heap.nrElemente;
+        heap.lungime = heap.nrElemente;
 
-		for (int i = (heap.nrElemente - 2) / 2; i >= 0; i--) {
-			filtreazaHeap(heap, i);
-		}
-	}
-	else {
-		printf("Fisierul nu a putut fi deschis.\n");
-	}
+        for (int i = (heap.nrElemente - 2) / 2; i >= 0; i--) {
+            filtreazaHeap(heap, i);
+        }
+    }
+    else {
+        printf("Fisierul nu a putut fi deschis.\n");
+    }
 
-	return heap;
+    return heap;
 }
 
 void afisareHeap(Heap heap) {
-	for (int i = 0; i < heap.nrElemente; i++) {
-		afisareMasina(heap.vector[i]);
-	}
+    for (int i = 0; i < heap.nrElemente; i++) {
+        afisareStudent(heap.vector[i]);
+    }
 }
 
 void afiseazaHeapAscuns(Heap heap) {
-	for (int i = heap.nrElemente; i < heap.lungime; i++) {
-		afisareMasina(heap.vector[i]);
-	}
+    for (int i = heap.nrElemente; i < heap.lungime; i++) {
+        afisareStudent(heap.vector[i]);
+    }
 }
 
-Masina extrageMasina(void* heap) {
-	Heap* h = (Heap*)heap;
+Student extrageStudent(void* heap) {
+    Heap* h = (Heap*)heap;
 
-	if (h->nrElemente > 0) {
-		Masina aux = h->vector[0];
+    if (h->nrElemente > 0) {
+        Student aux = h->vector[0];
 
-		h->vector[0] = h->vector[h->nrElemente - 1];
-		h->vector[h->nrElemente - 1] = aux;
+        h->vector[0] = h->vector[h->nrElemente - 1];
+        h->vector[h->nrElemente - 1] = aux;
 
-		h->nrElemente--;
+        h->nrElemente--;
 
-		filtreazaHeap(*h, 0);
+        filtreazaHeap(*h, 0);
 
-		return aux;
-	}
+        return aux;
+    }
 
-	Masina m;
-	m.id = -1;
-	m.nrUsi = 0;
-	m.pret = 0;
-	m.model = NULL;
-	m.numeSofer = NULL;
-	m.serie = '-';
-	return m;
+    Student s;
+    s.id = -1;
+    s.varsta = 0;
+    s.medie = 0;
+    s.nume = NULL;
+    s.facultate = NULL;
+    s.grupa = '-';
+    return s;
 }
 
 void dezalocareHeap(Heap* heap) {
-	for (int i = 0; i < heap->lungime; i++) {
-		free(heap->vector[i].model);
-		free(heap->vector[i].numeSofer);
-	}
+    for (int i = 0; i < heap->lungime; i++) {
+        free(heap->vector[i].nume);
+        free(heap->vector[i].facultate);
+    }
 
-	free(heap->vector);
-	heap->vector = NULL;
-	heap->lungime = 0;
-	heap->nrElemente = 0;
+    free(heap->vector);
+    heap->vector = NULL;
+    heap->lungime = 0;
+    heap->nrElemente = 0;
 }
 
 int main() {
-	Heap heap = citireHeapDeMasiniDinFisier("masini.txt");
+    Heap heap = citireHeapDeStudentiDinFisier("studenti.txt");
 
-	printf("Elementele din heap sunt:\n");
-	afisareHeap(heap);
+    printf("Elementele din heap sunt:\n");
+    afisareHeap(heap);
 
-	printf("\nMasina extrasa:\n");
-	Masina m = extrageMasina(&heap);
-	afisareMasina(m);
+    printf("\nStudent extras:\n");
+    Student s = extrageStudent(&heap);
+    afisareStudent(s);
 
-	printf("\nElementele vizibile ramase in heap sunt:\n");
-	afisareHeap(heap);
+    printf("\nElementele vizibile ramase in heap sunt:\n");
+    afisareHeap(heap);
 
-	printf("\nElementele ascunse din heap sunt:\n");
-	afiseazaHeapAscuns(heap);
+    printf("\nElementele ascunse din heap sunt:\n");
+    afiseazaHeapAscuns(heap);
 
-	dezalocareHeap(&heap);
+    dezalocareHeap(&heap);
 
-	return 0;
+    return 0;
 }
