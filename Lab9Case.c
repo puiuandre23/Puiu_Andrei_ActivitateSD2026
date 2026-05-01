@@ -19,6 +19,7 @@ typedef struct Nod {
 } Nod;
 
 
+
 Casa citireCasaDinFisier(FILE* f) {
     Casa c;
     char buffer[100];
